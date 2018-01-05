@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title%}Music{% endblock %}
+{% block content %}
+
+<h2>Songs</h2>
+{% if music %}
+	<p>There are/is {{ music|length }} song{{ music|pluralize }} registrated. </p>
+	<ul>
+	{% for music in music%}
+		<li>{{ music.title }} ({{ music.singer }}, {{ music.genre }}) </li>
+		<br>
+		{% load filtro_url %}
+		{%with music.audio_file|songurl as songurl%}
+			{% with 'music/mp3/'|add:songurl as songi %}
+				{%load static%}
+				<audio controls="controls">
+				<source src="{% static songi %}" type="audio/mpeg" />
+				</audio><br>
+			{% endwith %}
+		{% endwith %}
+		{%with music.cover_image|songurl as songcover%}
+			{% with 'music/cover/'|add:songcover as songcover %}
+				{%load static%}
+				{% if music.cover_image %}
+					<img src="{% static songcover %}" height="42" width="42">
+				{% endif %}
+			{% endwith %}
+		{% endwith %}
+		<br>
+		
+		{% if music.lyrics %}
+			<div class="divspoiler"><input type="button" value="Show Lyrics" onclick="if (this.parentNode.nextSibling.childNodes[0].style.display != '') { this.parentNode.nextSibling.childNodes[0].style.display = ''; this.value = 'Hide'; } else { this.parentNode.nextSibling.childNodes[0].style.display = 'none'; this.value = 'Show Lyrics'; }" />
+			</div><div><div class="spoiler" style="display: none;">
+			{{ music.lyrics|linebreaks }}
+			</div></div>
+		{% endif %}
+		{% if music.video_url %}
+			<div class="divspoiler"><input type="button" value="Show Video" onclick="if (this.parentNode.nextSibling.childNodes[0].style.display != '') { this.parentNode.nextSibling.childNodes[0].style.display = ''; this.value = 'Hide'; } else { this.parentNode.nextSibling.childNodes[0].style.display = 'none'; this.value = 'Show Video'; }" />
+			</div><div><div class="spoiler" style="display: none;">
+				<iframe width="420" height="315" src="{{ music.video_url }}"></iframe>
+			</div></div>
+		{% endif %}
+	{% endfor %}
+	</ul>
+{% else %}
+	<p>No songs registrated.</p>
+{% endif %}
+
+{% endblock %}
